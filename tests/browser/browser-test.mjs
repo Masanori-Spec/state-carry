@@ -112,6 +112,10 @@ try {
         true,
       );
       await page.locator("#language").selectOption("en");
+      assert.equal(
+        await page.locator("#status").textContent(),
+        "Some results need review. Inspect execution, expectations and preservation separately.",
+      );
       assert.ok(
         (await page.locator("h1").textContent()).includes(
           "carry the important things",
@@ -498,6 +502,21 @@ try {
           fullPage: true,
         });
         await reportPage.emulateMedia({ media: "print" });
+        assert.deepEqual(
+          await reportPage.evaluate(() => ({
+            heading: getComputedStyle(document.querySelector("h3")).breakAfter,
+            shortBlock: getComputedStyle(
+              document.querySelector("pre.print-keep"),
+            ).breakInside,
+            pageRule: [...document.styleSheets[0].cssRules].some(
+              (r) =>
+                r instanceof CSSPageRule &&
+                r.style.size === "a4" &&
+                r.style.margin === "16mm 14mm",
+            ),
+          })),
+          { heading: "avoid", shortBlock: "avoid", pageRule: true },
+        );
         await reportPage.pdf({
           path: `${dir}/exported-report-print.pdf`,
           format: "A4",
@@ -521,6 +540,10 @@ try {
       );
       await page.setViewportSize({ width: 390, height: 844 });
       await page.locator("#language").selectOption("ja");
+      assert.equal(
+        await page.locator("#status").textContent(),
+        "不一致または未確認の項目があります。3つの結果を分けて確認してください。",
+      );
       for (const name of ["plan", "fixtures", "review"]) {
         await tab(name);
         assert.ok(
@@ -548,6 +571,24 @@ try {
       await page.locator("#language").selectOption("en");
       await tab("review");
       await page.emulateMedia({ media: "print" });
+      assert.deepEqual(
+        await page.evaluate(() => ({
+          accountingHeading: getComputedStyle(
+            document.querySelector('[data-t="accounting"]'),
+          ).breakAfter,
+          shortBlock: getComputedStyle(document.querySelector("pre.print-keep"))
+            .breakInside,
+          pageRule: [...document.styleSheets].some((sheet) =>
+            [...sheet.cssRules].some(
+              (r) =>
+                r instanceof CSSPageRule &&
+                r.style.size === "a4" &&
+                r.style.margin === "16mm 14mm",
+            ),
+          ),
+        })),
+        { accountingHeading: "avoid", shortBlock: "avoid", pageRule: true },
+      );
       await page.pdf({
         path: `${dir}/review-print.pdf`,
         format: "A4",

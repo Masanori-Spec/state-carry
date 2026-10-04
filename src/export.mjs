@@ -70,6 +70,27 @@ const h = (s) =>
         c
       ],
   );
+// Keep short blocks intact in print; let long blocks paginate. Count likely
+// wrapped rows conservatively, including wide characters and long single lines.
+// This is a layout hint, not a measured font-size or page-fit guarantee.
+export function printBlockClass(text, columns = 88) {
+  let rows = 1,
+    width = 0;
+  for (const char of text) {
+    if (char === "\n") {
+      rows++;
+      width = 0;
+    } else {
+      width += char === "\t" ? 4 : char.codePointAt(0) > 255 ? 2 : 1;
+      if (width > columns) {
+        rows += Math.floor((width - 1) / columns);
+        width = ((width - 1) % columns) + 1;
+      }
+    }
+    if (rows > 32) return "print-flow";
+  }
+  return "print-keep";
+}
 export function reportHTML(project, r = runProject(project)) {
   const parts = [];
   let remaining = LIMITS.htmlEstimateBytes;
@@ -84,16 +105,16 @@ export function reportHTML(project, r = runProject(project)) {
     parts.push(html);
   }
   function jsonBlock(value) {
-    append("<pre>");
     // Pretty-print whitespace and escaping are charged exactly as emitted.
     // Escape bounded slices rather than materializing an expanded whole block.
     const formatted = JSON.stringify(value, null, 2);
+    append(`<pre class="${printBlockClass(formatted)}">`);
     for (let index = 0; index < formatted.length; index += 2048)
       append(h(formatted.slice(index, index + 2048)));
     append("</pre>");
   }
   append(
-    `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><title>StateCarry · ${h(project.name)}</title><style>body{font:14px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;color:#283a35;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}td,th{padding:8px;border:1px solid #c7d3c5;text-align:left;overflow-wrap:anywhere}th{background:#e9eee4}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f3ea;padding:15px;font-size:11px}.note{padding:15px;background:#fff2d4}h2{margin-top:35px}@media print{body{margin:0;padding:0}tr{break-inside:avoid}h2{break-after:avoid}}</style><body><small>STATECARRY / PRESERVATION REVIEW · statecarry/v1</small><h1>${h(project.name)}</h1><p>${r.ok ? "Contract and expected results passed for these fixtures" : "Review required"} · ${r.summary.passed}/${r.summary.fixtures} fixtures passed · ${r.summary.overwrites} overwrite warnings</p><p class="note">A passed fixture does not prove that all saved user data can survive. Expected values and intent declarations are independently authored. Equal values at the same path are observations, not identity or move inference. Empty containers count as original leaves. No storage, network or automatic user-file migration occurs.</p><h2>Version chain</h2><p>${project.versions.join(" → ")}</p>`,
+    `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><title>StateCarry · ${h(project.name)}</title><style>body{font:14px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;color:#283a35;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}td,th{padding:8px;border:1px solid #c7d3c5;text-align:left;overflow-wrap:anywhere}th{background:#e9eee4}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f3ea;padding:15px;font-size:11px}.note{padding:15px;background:#fff2d4}h2{margin-top:35px}@page{size:A4;margin:16mm 14mm}@media print{body{margin:0;padding:0;font-size:11px}h1,h2,h3,h4{break-inside:avoid;break-after:avoid}p{orphans:3;widows:3}tr{break-inside:avoid}pre{font:10px/1.45 ui-monospace,monospace;break-inside:auto;orphans:3;widows:3}pre.print-keep{break-inside:avoid}}</style><body><small>STATECARRY / PRESERVATION REVIEW · statecarry/v1</small><h1>${h(project.name)}</h1><p>${r.ok ? "Contract and expected results passed for these fixtures" : "Review required"} · ${r.summary.passed}/${r.summary.fixtures} fixtures passed · ${r.summary.overwrites} overwrite warnings</p><p class="note">A passed fixture does not prove that all saved user data can survive. Expected values and intent declarations are independently authored. Equal values at the same path are observations, not identity or move inference. Empty containers count as original leaves. No storage, network or automatic user-file migration occurs.</p><h2>Version chain</h2><p>${project.versions.join(" → ")}</p>`,
   );
   for (const step of project.transitions) {
     append(`<h3>${step.from} → ${step.to}</h3>`);

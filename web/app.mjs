@@ -14,6 +14,7 @@ import {
   fixtureSource,
   RUNNER_SOURCE,
   reportHTML,
+  printBlockClass,
 } from "../src/export.mjs";
 import { CORE_SOURCE, WORKER_SOURCE } from "../src/runtime-source.mjs";
 const $ = (id) => document.getElementById(id),
@@ -256,6 +257,29 @@ $("language").onchange = guard(() => {
           (lang === "ja" ? ja : en)[e.dataset.t] ?? ja[e.dataset.t]),
     );
   render();
+  // The previous action's message may be in the other language. Summarize the
+  // current state instead; this never changes the report or starts another run.
+  status(
+    worker
+      ? choose(
+          "コピー上でフィクスチャを検証しています。",
+          "Verifying fixtures on copies.",
+        )
+      : report
+        ? report.ok
+          ? choose(
+              "このフィクスチャ群の期待値と契約に一致しました。",
+              "Expected results and contracts passed for these fixtures.",
+            )
+          : choose(
+              "不一致または未確認の項目があります。3つの結果を分けて確認してください。",
+              "Some results need review. Inspect execution, expectations and preservation separately.",
+            )
+        : choose(
+            "結果は未検証です。検証を実行してください。",
+            "Results are stale. Run verification.",
+          ),
+  );
 });
 function renderMetrics() {
   $("metrics").replaceChildren();
@@ -302,9 +326,11 @@ function render() {
   renderPlan();
   renderFixture();
   renderResults();
-  $("freshness").textContent = report
-    ? choose("現行のプランで検証済み", "CURRENT PLAN VERIFIED")
-    : choose("未検証 / 再実行が必要", "STALE / RERUN REQUIRED");
+  $("freshness").textContent = worker
+    ? choose("検証中…", "VERIFYING…")
+    : report
+      ? choose("現行のプランで検証済み", "CURRENT PLAN VERIFIED")
+      : choose("未検証 / 再実行が必要", "STALE / RERUN REQUIRED");
 }
 function renderPlan() {
   $("version-rail").replaceChildren();
@@ -677,6 +703,8 @@ function renderResults() {
     0,
     20000,
   );
+  for (const id of ["actual-output", "expected-output"])
+    $(id).className = printBlockClass($(id).textContent, 40);
   $("step-previews").replaceChildren();
   for (const s of r.migration.steps) {
     $("step-previews").append(
@@ -684,6 +712,9 @@ function renderResults() {
       element(
         "pre",
         `BEFORE (max 2000 chars)\n${s.beforePreview}\n\nAFTER (max 2000 chars)\n${s.afterPreview ?? "(no partial output)"}`,
+        printBlockClass(
+          `BEFORE (max 2000 chars)\n${s.beforePreview}\n\nAFTER (max 2000 chars)\n${s.afterPreview ?? "(no partial output)"}`,
+        ),
       ),
     );
   }

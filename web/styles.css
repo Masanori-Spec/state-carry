@@ -1302,7 +1302,14 @@ dialog > label {
     font-size: 10px;
   }
 }
+@page {
+  size: A4;
+  margin: 16mm 14mm;
+}
 @media print {
+  :root {
+    background: white;
+  }
   header,
   .hero,
   .scope,
@@ -1343,7 +1350,14 @@ dialog > label {
   }
   pre {
     max-height: none;
+    overflow: visible;
     font-size: 8px;
+    orphans: 3;
+    widows: 3;
+    break-inside: auto;
+  }
+  pre.print-keep {
+    break-inside: avoid;
   }
   .review-grid {
     grid-template-columns: 1fr 1fr;
@@ -1363,7 +1377,21 @@ dialog > label {
   tr {
     break-inside: avoid;
   }
-  h3 {
+  h1,
+  h2,
+  h3,
+  h4,
+  .section-head,
+  .eyebrow,
+  summary {
+    break-inside: avoid;
     break-after: avoid;
+  }
+  .table-scroll {
+    break-before: avoid;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
   }
 }
