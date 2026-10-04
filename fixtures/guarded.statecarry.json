@@ -1,0 +1,177 @@
+{
+  "schema": "statecarry/v1",
+  "name": "Harbor editor · guarded upgrade",
+  "versions": [
+    1,
+    2,
+    3
+  ],
+  "transitions": [
+    {
+      "from": 1,
+      "to": 2,
+      "ops": [
+        {
+          "op": "test",
+          "path": "/metadata/title",
+          "value": null
+        },
+        {
+          "op": "move",
+          "from": "/title",
+          "path": "/metadata/title"
+        }
+      ]
+    },
+    {
+      "from": 2,
+      "to": 3,
+      "ops": [
+        {
+          "op": "add",
+          "path": "/presentation",
+          "value": {
+            "theme": "paper",
+            "zoom": 1
+          }
+        }
+      ]
+    }
+  ],
+  "fixtures": [
+    {
+      "id": "ordinary",
+      "name": "V1 · custom data and empty containers",
+      "input": {
+        "version": 1,
+        "payload": {
+          "title": "Harbor map",
+          "metadata": {
+            "title": null
+          },
+          "customFields": {
+            "owner": "Aya",
+            "workshop": "north"
+          },
+          "items": [
+            {
+              "id": "dock",
+              "label": "Dock",
+              "tags": []
+            }
+          ],
+          "empty": {}
+        }
+      },
+      "expected": {
+        "kind": "value",
+        "value": {
+          "version": 3,
+          "payload": {
+            "metadata": {
+              "title": "Harbor map"
+            },
+            "customFields": {
+              "owner": "Aya",
+              "workshop": "north"
+            },
+            "items": [
+              {
+                "id": "dock",
+                "label": "Dock",
+                "tags": []
+              }
+            ],
+            "empty": {},
+            "presentation": {
+              "theme": "paper",
+              "zoom": 1
+            }
+          }
+        }
+      },
+      "contracts": [
+        {
+          "kind": "preserve",
+          "source": "/title",
+          "target": "/metadata/title",
+          "reason": "Move the project title without changing its value"
+        },
+        {
+          "kind": "change",
+          "source": "/metadata/title",
+          "target": "/metadata/title",
+          "reason": "Replace the explicit null placeholder with the old title"
+        }
+      ]
+    },
+    {
+      "id": "collision",
+      "name": "V1 · existing title must reject",
+      "input": {
+        "version": 1,
+        "payload": {
+          "title": "Harbor map",
+          "metadata": {
+            "title": "Owner-authored title"
+          },
+          "customFields": {
+            "owner": "Aya",
+            "workshop": "north"
+          },
+          "items": [
+            {
+              "id": "dock",
+              "label": "Dock",
+              "tags": []
+            }
+          ],
+          "empty": {}
+        }
+      },
+      "expected": {
+        "kind": "error",
+        "code": "PATCH_FAILED"
+      },
+      "contracts": []
+    },
+    {
+      "id": "intermediate",
+      "name": "V2 · skip no version",
+      "input": {
+        "version": 2,
+        "payload": {
+          "metadata": {
+            "title": "Version two project"
+          },
+          "customFields": {
+            "futureField": "keep me"
+          },
+          "items": [],
+          "empty": {}
+        }
+      },
+      "expected": {
+        "kind": "value",
+        "value": {
+          "version": 3,
+          "payload": {
+            "metadata": {
+              "title": "Version two project"
+            },
+            "customFields": {
+              "futureField": "keep me"
+            },
+            "items": [],
+            "empty": {},
+            "presentation": {
+              "theme": "paper",
+              "zoom": 1
+            }
+          }
+        }
+      },
+      "contracts": []
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "state-carry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Saved-project migration rehearsals with independent expected fixtures and preservation contracts",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:differential": "node tests/differential.mjs",
+    "check": "npm run build && node scripts/check.mjs && npm test && npm run test:differential",
+    "serve": "node scripts/serve.mjs",
+    "test:browser": "node tests/browser/browser-test.mjs",
+    "package": "python3 scripts/package.py"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.0"
+  }
+}

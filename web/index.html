@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#243e50" />
+    <meta
+      name="description"
+      content="StateCarry: saved-project migrations with independently expected fixtures and explicit preservation contracts."
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; worker-src 'self' blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>StateCarry · preservation-first migrations</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">メインへ / Skip to content</a>
+    <header>
+      <a class="brand" href="#main"
+        ><span class="mark">S<span>→</span></span
+        >StateCarry<span class="version">/ 01</span></a
+      >
+      <div class="head-actions">
+        <span class="local" data-t="local"
+          >ローカル処理・保存先に接続しません</span
+        ><label class="sr-only" for="language">Language</label
+        ><select id="language">
+          <option value="ja">日本語</option>
+          <option value="en">English</option></select
+        ><a href="#guide" data-t="guideLink">使い方 ↗</a>
+      </div>
+    </header>
+    <main id="main" tabindex="-1">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">SAVED DATA / REVIEWED UPGRADES</p>
+          <h1 data-t="headline">
+            形式が変わっても、<br />大切なデータは連れていく。
+          </h1>
+          <p class="lede" data-t="lede">
+            保存済みプロジェクトの更新を、独立した期待値と保持契約でリハーサル。移行が動いたことと、守るべき値が残ったことを分けて確かめます。
+          </p>
+          <div class="hero-actions">
+            <button class="primary" id="example-risk" data-t="riskExample">
+              上書きのある例を開く</button
+            ><button id="example-safe" data-t="safeExample">
+              ガードを加えた例 ↗
+            </button>
+          </div>
+        </div>
+        <div class="hero-card" aria-hidden="true">
+          <div class="card-top">
+            A PROJECT, CARRIED FORWARD <span>01 → 03</span>
+          </div>
+          <div class="journey">
+            <span>v1</span><i>→</i><span>v2</span><i>→</i><span>v3</span>
+          </div>
+          <div class="carry-line">
+            <span>/title</span><span>→</span><strong>/metadata/title</strong>
+          </div>
+          <div class="carry-line">
+            <span>/customFields</span><span>＝</span
+            ><strong>/customFields</strong>
+          </div>
+          <p data-t="heroNote">変更するところ。変えてはいけないところ。</p>
+        </div>
+      </section>
+      <aside class="scope">
+        <b>i</b
+        ><span data-t="scope"
+          >データのコピーを検証します。アプリの保存領域・データベースへの接続や、ユーザーファイルの自動更新は行いません。全データの無損失を証明するものではありません。</span
+        >
+      </aside>
+      <section class="workspace">
+        <div class="workspace-head">
+          <div>
+            <p class="eyebrow" data-t="session">WORKSPACE / セッション内のみ</p>
+            <h2 id="project-title"></h2>
+          </div>
+          <div class="actions">
+            <button id="undo" data-t="undo">元に戻す</button
+            ><button id="open-import" data-t="import">JSONを開く</button
+            ><button id="save-project" data-t="save">保存 ↓</button
+            ><button id="run" class="primary" data-t="run">
+              全フィクスチャを検証</button
+            ><button id="cancel-run" hidden data-t="cancelRun">
+              検証を中止
+            </button>
+          </div>
+        </div>
+        <div id="status" role="status" aria-live="polite"></div>
+        <div class="metrics" id="metrics"></div>
+        <div class="tabs" role="tablist" aria-label="Workspace">
+          <button
+            id="tab-plan"
+            role="tab"
+            aria-controls="panel-plan"
+            aria-selected="true"
+            data-t="planTab"
+          >
+            01 移行プラン</button
+          ><button
+            id="tab-fixtures"
+            role="tab"
+            aria-controls="panel-fixtures"
+            aria-selected="false"
+            tabindex="-1"
+            data-t="fixturesTab"
+          >
+            02 基準と契約</button
+          ><button
+            id="tab-review"
+            role="tab"
+            aria-controls="panel-review"
+            aria-selected="false"
+            tabindex="-1"
+            data-t="reviewTab"
+          >
+            03 確認・持ち出し</button
+          ><span id="freshness" class="freshness"></span>
+        </div>
+        <section
+          class="panel"
+          id="panel-plan"
+          role="tabpanel"
+          aria-labelledby="tab-plan"
+        >
+          <div class="plan-layout">
+            <aside class="rail">
+              <p class="eyebrow" data-t="versionChain">
+                VERSION CHAIN / 直線の更新経路
+              </p>
+              <div id="version-rail"></div>
+              <button id="add-version" data-t="addVersion">
+                ＋ 次のバージョン
+              </button>
+              <p class="hint" data-t="chainHint">
+                連続する整数バージョンのみ。途中のバージョンからも、最後まで検証します。
+              </p>
+            </aside>
+            <div class="patch-editor">
+              <div class="section-head">
+                <h3 id="step-title"></h3>
+                <span class="pill">RFC 6902</span>
+              </div>
+              <div class="operation-list" id="operation-list"></div>
+              <details class="guided" open>
+                <summary data-t="guidedTitle">操作を追加する</summary>
+                <form id="operation-form">
+                  <div class="two">
+                    <label
+                      ><span data-t="operation">操作</span
+                      ><select name="op">
+                        <option>test</option>
+                        <option>move</option>
+                        <option>copy</option>
+                        <option>add</option>
+                        <option>remove</option>
+                        <option>replace</option>
+                      </select></label
+                    ><label
+                      ><span data-t="path">宛先ポインター</span
+                      ><input
+                        name="path"
+                        value="/metadata/title"
+                        maxlength="1024"
+                        spellcheck="false"
+                    /></label>
+                  </div>
+                  <label id="from-label"
+                    ><span data-t="from">元のポインター</span
+                    ><input
+                      name="from"
+                      maxlength="1024"
+                      spellcheck="false"
+                      value="/title" /></label
+                  ><label id="value-label"
+                    ><span data-t="value">JSON値</span
+                    ><textarea name="value" rows="2" spellcheck="false">
+null</textarea
+                    ></label
+                  ><button type="submit" data-t="appendOperation">
+                    末尾に追加
+                  </button>
+                </form>
+                <p class="hint" data-t="operationHint">
+                  addは既存オブジェクトキーを上書きします。配列の位置は操作のたびに変わります。testは合わない入力を、更新前に止めるガードになります。
+                </p>
+              </details>
+              <label
+                ><span data-t="patchJSON">パッチJSON / 順序を含めて編集</span
+                ><textarea
+                  id="patch-json"
+                  class="code"
+                  rows="11"
+                  spellcheck="false"
+                ></textarea>
+              </label>
+              <div class="form-actions">
+                <button id="apply-patch" class="primary" data-t="applyPatch">
+                  パッチを適用</button
+                ><button id="cancel-patch" data-t="cancel">取り消す</button>
+              </div>
+              <p class="hint" data-t="fixedExpectation">
+                プランを変えても、独立した期待値と保持契約は自動更新されません。
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="panel"
+          id="panel-fixtures"
+          role="tabpanel"
+          aria-labelledby="tab-fixtures"
+          hidden
+        >
+          <div class="section-head">
+            <div>
+              <h3 data-t="fixtureHeading">基準は、移行コードの外に。</h3>
+              <p class="muted" data-t="fixtureDescription">
+                元のデータ、独立した期待値、保持したい関係を別々に記録します。
+              </p>
+            </div>
+            <button id="add-fixture" data-t="addFixture">
+              ＋ フィクスチャ
+            </button>
+          </div>
+          <label class="fixture-select"
+            ><span data-t="selectFixture">フィクスチャ</span
+            ><select id="fixture-select"></select
+          ></label>
+          <div class="fixture-grid">
+            <div class="fixture-box">
+              <p class="eyebrow">ORIGINAL / INPUT ENVELOPE</p>
+              <label
+                ><span data-t="fixtureName">フィクスチャ名</span
+                ><input id="fixture-name" maxlength="120" /></label
+              ><label
+                ><span data-t="originalJSON">元のversionとpayload</span
+                ><textarea
+                  id="input-json"
+                  class="code"
+                  rows="17"
+                  spellcheck="false"
+                ></textarea>
+              </label>
+            </div>
+            <div class="fixture-box expected">
+              <p class="eyebrow">INDEPENDENT / EXPECTED RESULT</p>
+              <label
+                ><span data-t="expectedKind">期待する結果</span
+                ><select id="expected-kind">
+                  <option value="value" data-t="expectedValue">JSON出力</option>
+                  <option value="error" data-t="expectedError">
+                    明示したエラー
+                  </option>
+                  <option value="unasserted" data-t="unasserted">
+                    未検証・探索用
+                  </option>
+                </select></label
+              ><label
+                ><span id="expected-label" data-t="expectedJSON"
+                  >独立した期待値（JSON）</span
+                ><textarea
+                  id="expected-json"
+                  class="code"
+                  rows="17"
+                  spellcheck="false"
+                ></textarea>
+              </label>
+              <p class="hint" data-t="expectedHint">
+                値は自分で入力するか、独立した基準から作成します。実行結果から期待値を生成するボタンはありません。
+              </p>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button id="apply-fixture" class="primary" data-t="applyFixture">
+              基準を保存</button
+            ><button id="cancel-fixture" data-t="cancel">取り消す</button>
+          </div>
+          <div class="contracts-editor">
+            <div class="section-head">
+              <div>
+                <h3 data-t="contractHeading">保持と変更の契約</h3>
+                <p class="muted" data-t="contractDescription">
+                  古い値と新しい値の関係を指定します。意図的な変更・削除には理由が必要です。
+                </p>
+              </div>
+            </div>
+            <form id="contract-form">
+              <div class="contract-fields">
+                <label
+                  ><span data-t="contractKind">契約</span
+                  ><select name="kind">
+                    <option value="preserve" data-t="preserve">
+                      保持 / 値を等しく
+                    </option>
+                    <option value="change" data-t="change">意図した変更</option>
+                    <option value="drop" data-t="drop">意図した削除</option>
+                  </select></label
+                ><label
+                  ><span data-t="sourcePointer">旧データのポインター</span
+                  ><input
+                    name="source"
+                    maxlength="1024"
+                    placeholder="/title" /></label
+                ><label
+                  ><span data-t="targetPointer">新データのポインター</span
+                  ><input
+                    name="target"
+                    maxlength="1024"
+                    placeholder="/metadata/title" /></label
+                ><label
+                  ><span data-t="reason">理由</span
+                  ><input name="reason" maxlength="500"
+                /></label>
+              </div>
+              <button type="submit" data-t="appendContract">契約を追加</button>
+            </form>
+            <label
+              ><span data-t="contractsJSON">契約JSON</span
+              ><textarea
+                id="contracts-json"
+                class="code"
+                rows="9"
+                spellcheck="false"
+              ></textarea>
+            </label>
+            <div class="form-actions">
+              <button
+                id="apply-contracts"
+                class="primary"
+                data-t="applyContracts"
+              >
+                契約を保存</button
+              ><button id="cancel-contracts" data-t="cancel">取り消す</button>
+            </div>
+            <p class="hint" data-t="contractHint">
+              空オブジェクト・空配列も元データの1項目として数えます。配列ポインターは位置です。同じ値が別の場所にあっても、移動を推測しません。
+            </p>
+          </div>
+        </section>
+        <section
+          class="panel"
+          id="panel-review"
+          role="tabpanel"
+          aria-labelledby="tab-review"
+          hidden
+        >
+          <div class="section-head">
+            <div>
+              <h3 data-t="reviewHeading">動いたことと、守れたこと。</h3>
+              <p class="muted" data-t="reviewDescription">
+                操作の完了・期待値との一致・保持契約を、それぞれ確認します。
+              </p>
+            </div>
+          </div>
+          <div id="review-empty" class="empty" data-t="reviewEmpty">
+            検証を実行すると、ここに新しい結果が表示されます。
+          </div>
+          <div id="review-content" hidden>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-t="fixture">フィクスチャ</th>
+                    <th data-t="execution">操作</th>
+                    <th data-t="expected">期待値</th>
+                    <th data-t="contract">保持契約</th>
+                  </tr>
+                </thead>
+                <tbody id="result-rows"></tbody>
+              </table>
+            </div>
+            <div class="section-head detail-head">
+              <h3 id="result-title"></h3>
+              <span id="result-verdict" class="pill"></span>
+            </div>
+            <div id="warnings" class="warnings"></div>
+            <div class="review-grid">
+              <div>
+                <p class="eyebrow">ACTUAL / MIGRATION RESULT</p>
+                <pre id="actual-output"></pre>
+              </div>
+              <div>
+                <p class="eyebrow">INDEPENDENT / EXPECTED</p>
+                <pre id="expected-output"></pre>
+              </div>
+            </div>
+            <details class="steps-detail">
+              <summary data-t="stepPreview">
+                バージョンごとの結果（短縮プレビュー）
+              </summary>
+              <div id="step-previews"></div>
+            </details>
+            <h4 data-t="accounting">元データの項目を追跡</h4>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-t="originalPath">元のパス</th>
+                    <th data-t="originalValue">元の値</th>
+                    <th data-t="accountStatus">観測・契約の状態</th>
+                  </tr>
+                </thead>
+                <tbody id="accounting-rows"></tbody>
+              </table>
+            </div>
+            <p id="accounting-limit" class="hint"></p>
+          </div>
+          <div class="exports">
+            <button id="export-module">
+              <span>01 / JAVASCRIPT</span
+              ><strong data-t="exportModule">純粋な移行モジュール</strong
+              ><small data-t="exportModuleSub"
+                >検証と同じエンジン</small
+              ></button
+            ><button id="export-fixtures">
+              <span>02 / JSON</span
+              ><strong data-t="exportFixtures">独立したフィクスチャ</strong
+              ><small data-t="exportFixturesSub"
+                >元データ・期待値・契約</small
+              ></button
+            ><button id="export-runner">
+              <span>03 / NODE.JS</span
+              ><strong data-t="exportRunner">再実行ランナー</strong
+              ><small data-t="exportRunnerSub">外部依存なし</small></button
+            ><button id="export-report">
+              <span>04 / HTML</span
+              ><strong data-t="exportReport">保持レビュー</strong
+              ><small data-t="exportReportSub">警告・項目別記録</small>
+            </button>
+          </div>
+          <div class="terminal">
+            <span data-t="runLocally"
+              >3つのファイルを同じフォルダに保存して実行</span
+            ><code>node statecarry-run.mjs statecarry-fixtures.json</code
+            ><small data-t="exitHint"
+              >終了コード 0: フィクスチャ一致 / 1: 不一致・未完了 / 2:
+              入力エラー</small
+            >
+          </div>
+          <p class="hint" data-t="reviewCaution">
+            一致は、このフィクスチャと契約の範囲です。全ての保存データ、端末、アプリ統合や無損失を保証しません。実データに使う前に、別のコピーで検証してください。
+          </p>
+        </section>
+      </section>
+      <section class="guide" id="guide">
+        <div>
+          <p class="eyebrow">FIELD NOTES</p>
+          <h2 data-t="guideTitle">変える前に、<br />残すものを決める。</h2>
+        </div>
+        <div class="guide-grid">
+          <article>
+            <span>01</span>
+            <h3 data-t="g1t">期待値を固定する</h3>
+            <p data-t="g1">
+              コードの出力をそのまま正解にしません。元のデータと期待値は別々に保存し、移行の編集で自動更新しません。
+            </p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3 data-t="g2t">保持を明文化する</h3>
+            <p data-t="g2">
+              preserveは旧→新の値の一致。changeは独立した期待値への変更。dropは元のパスの不在。未確認の元項目が残れば契約は未完了です。
+            </p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3 data-t="g3t">コピーで失敗する</h3>
+            <p data-t="g3">
+              操作はコピー上で順番に実行します。途中で失敗しても元の入力は変更せず、部分更新した出力を返しません。
+            </p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3 data-t="g4t">範囲を絞る</h3>
+            <p data-t="g4">
+              16バージョン・各64操作・50フィクスチャ。4MiBのプロジェクト上限。任意JavaScript、保存領域、ネットワークへの接続はありません。
+            </p>
+          </article>
+        </div>
+      </section>
+      <footer>
+        <div class="brand">
+          StateCarry<span class="version">/ preserve with intent</span>
+        </div>
+        <div>
+          <a
+            href="https://datatracker.ietf.org/doc/html/rfc6902"
+            target="_blank"
+            rel="noopener noreferrer"
+            >JSON Patch ↗</a
+          ><a
+            href="https://www.rfc-editor.org/rfc/rfc6901"
+            target="_blank"
+            rel="noopener noreferrer"
+            >JSON Pointer ↗</a
+          >
+        </div>
+        <p data-t="footer">
+          読み込み後の計算はオフライン。再読み込み前にJSONを保存してください。
+        </p>
+      </footer>
+    </main>
+    <dialog id="import-dialog">
+      <div class="section-head">
+        <h2 data-t="importTitle">プロジェクトJSONを開く</h2>
+        <button id="close-import" aria-label="閉じる / Close">×</button>
+      </div>
+      <p data-t="importHint">
+        入力エラーは現在の作業を変更しません。最大4MiB、UTF-8。読み込みで結果は未検証に戻ります。
+      </p>
+      <label
+        ><span data-t="file">ファイル</span
+        ><input
+          type="file"
+          id="import-file"
+          accept=".json,application/json" /></label
+      ><label
+        ><span data-t="paste">または貼り付け</span
+        ><textarea
+          id="import-json"
+          rows="12"
+          spellcheck="false"
+          class="code"
+          maxlength="4194304"
+        ></textarea>
+      </label>
+      <p id="import-error" role="alert"></p>
+      <div class="form-actions">
+        <button id="apply-import" class="primary" data-t="load">読み込む</button
+        ><button id="cancel-import" data-t="cancel">取り消す</button>
+      </div>
+    </dialog>
+    <script type="module" src="./app.mjs"></script>
+  </body>
+</html>
