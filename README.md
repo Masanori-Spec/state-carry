@@ -2,6 +2,10 @@
 
 **形式が変わっても、大切なデータは連れていく。**
 
+![StateCarry Japanese migration plan, captured from the tested application](docs/evidence/browser/desktop-plan-ja.png)
+
+Actual Chromium capture. [English review](docs/evidence/browser/desktop-overwrite-en.png) · [Mobile review](docs/evidence/browser/mobile-review-ja.png)
+
 StateCarry rehearses saved-project upgrades against independently authored fixtures and preservation contracts. It separates three questions:
 
 1. Did the migration operations execute?
@@ -82,9 +86,9 @@ python3 -m venv .venv
 PYTHON=.venv/bin/python npm run check
 ```
 
-At the reviewed freeze:158 tests passed, including108 enabled pinned JSON Patch corpus cases; four upstream-disabled cases remain skipped. An independent Python jsonpatch1.33 differential run covered1,200 patch sequences. A separate Python pointer/equality/contract oracle covered1,000 preservation cases. Exported modules and runners were actually executed against passing, intentionally failing and invalid fixtures.
+The [verified hosted run](https://github.com/Masanori-Spec/state-carry/actions/runs/37178149714) passed on Ubuntu 22.04 with Node 22 and 24: **161 tests passed per engine**, including 108 enabled pinned JSON Patch corpus cases; four upstream-disabled cases remain explicit skips. Independent Python references passed **1,200 patch sequences** and **1,000 preservation-contract cases**.
 
-The15-scenario sandboxed Chromium suite and Ubuntu22.04 CI are authored but **not run at the initial freeze**. Desktop/mobile/print visual inspection and hosted verification are also unrun. See [verification details](docs/VERIFICATION.md).
+All **15 sandboxed Chromium scenarios** passed under `/state-carry/`. Seven actual desktop/mobile/export screenshots and both print PDFs were inspected. The browser-downloaded migration module, fixtures and Node runner were executed again: the passing bundle returns exit 0 and the separately retained intentional mismatch returns exit 1. See [verification details](docs/VERIFICATION.md), [visual inspection](docs/VISUAL_REVIEW.md) and the unchanged [independent review](docs/INDEPENDENT_REVIEW.md). These checks cover synthetic examples, not a real application's saved data or storage integration.
 
 ## Deliberate limits
 

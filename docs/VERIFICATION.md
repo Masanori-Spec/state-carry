@@ -1,29 +1,29 @@
 # Verification record
 
-Initial review freeze:2026-10-04. No local/shared browser execution or publication is performed by this build task.
+Verified on 2026-10-04. This evidence comes from functional commit `e064c17219cdc2784f2a11dfda2a9ca76735ba3c` and [GitHub Actions run 37178149714](https://github.com/Masanori-Spec/state-carry/actions/runs/37178149714). The later documentation commit retains these exact artifacts and runs the same workflow again.
 
-## Executed
+## Executed engine checks
 
-- `npm run build` and JavaScript syntax checks: passed
-- Node test suite: **158 passed,0 failed,4 skipped**
-  - Includes108 enabled cases from the pinned JSON Patch corpus
-  - Four cases are disabled in the unmodified upstream corpus; their skips remain explicit
-  - The other31 tests cover migration/contract semantics, strict JSON bounds, atomicity, expected failures, overwrite notices, source parity and generated artifact execution
-- Python jsonpatch1.33 / jsonpointer3.0.0 differential reference: **1,200 seeded patch sequences passed**, comparing outputs/failures and input nonmutation
+- Ubuntu 22.04, Node 22 and 24, Python 3.12: all engine jobs passed
+- Clean `npm ci --ignore-scripts`, build and syntax/static checks: passed
+- **161 tests passed per engine, 0 failed, 4 skipped**
+  - 108 enabled cases from the pinned JSON Patch corpus
+  - Four cases disabled in the unmodified upstream corpus remain explicit skips
+  - 31 core/artifact tests, 19 independent-review regressions and 3 release regressions
+- Pinned Python jsonpatch 1.33 / jsonpointer 3.0.0 reference: **1,200 seeded patch sequences passed**, comparing outputs/failures and input nonmutation
 - Independently implemented Python pointer/deep-equality/preservation oracle: **1,000 seeded contract cases passed**
-- Generated standalone module and Node runner: passing guarded fixtures exit0, intentionally failing overwrite fixtures exit1, invalid fixture file exit2
-- Generated module result matches the authoring engine; original input remains unchanged
-- Static emitted-import resolution checks pass at both domain root and nested `/state-carry/` paths
+- Generated standalone module and Node runner: passing guarded fixtures exit 0, intentional mismatches exit 1, invalid fixture input exits 2
+- Generated module/source agreement and caller-input nonmutation: passed
+- Emitted import resolution at both domain root and nested `/state-carry/`: passed
 - Original-leaf accounting includes empty containers, explicit mapped preservation, intentional changes/drops and unreviewed data
-- Corpus files and Python packages are pinned; source hashes and retained notices accompany the project
 
-The differential seed is1396916562. The Python contract oracle does not import the JavaScript implementation. Corpus success is within the documented portable JSON profile, not a universal RFC implementation/conformance certification. Root document removal is an explicitly unsupported boundary. Expected outputs in randomized contract cases are independent copies deliberately altered in some cases; they are not regenerated from the JavaScript migration result.
+The differential seed is 1396916562. The Python contract oracle does not import the JavaScript implementation. Corpus success applies to the documented portable JSON profile; it is not universal RFC conformance certification. Root document removal remains unsupported. Randomized contract expectations are independent copies deliberately altered in some cases, never regenerated from the JavaScript migration result.
 
-## Authored but NOT run
+## Executed browser checks
 
-The15-scenario Playwright suite covers:
+All **15 Playwright scenarios passed** in Chromium with `chromiumSandbox: true`, served beneath `/state-carry/` on the runner's loopback interface:
 
-1. Both languages, skip link, roving tabs and deployed subpath
+1. Both locales, skip link, roving tabs and deployment subpath
 2. Existing-destination overwrite with distinct execution/expectation/contract statuses
 3. Unchanged independent fixtures after plan edits and stale export invalidation
 4. Pending edits, blocked navigation/export and cancellation
@@ -34,23 +34,31 @@ The15-scenario Playwright suite covers:
 9. Newer pasted JSON superseding delayed file reads
 10. Cancelled/stale workers never publishing a result
 11. Worker-start/download failure recovery
-12. Browser-downloaded artifact execution with passing/failing fixtures
-13. Offline reruns and390px responsive layouts in Japanese
-14. Printable PDF capture, dialog cancellation and reload behavior
+12. Browser-downloaded artifact execution with passing and separate failing fixtures, plus actual HTML-report screen/print capture
+13. Loaded-application offline reruns and 390 px responsive Japanese layouts
+14. Printable PDF capture, print-style assertions, dialog cancellation and reload behavior
 15. No external runtime requests or page errors
 
-CI is authored for Ubuntu22.04, Node22/24 and Python3.12. Chromium uses `chromiumSandbox:true`; browser tests serve the app under `/state-carry/`. Screenshots and print PDFs are configured as artifacts.
+Locale assertions verify that the status banner changes with the selected language. The suite also checks that locale changes during a worker run preserve the in-progress freshness state.
 
-**No CI success, actual browser execution, screenshot inspection, mobile visual pass, print-pagination pass, Firefox/Safari pass, hosted availability or production integration is claimed.** These remain checks for the independent review/publication phase. Source-level browser tests are not equivalent to executed evidence.
+## Actual visual and download inspection
 
-## Interpretation
+Seven screenshots were inspected: Japanese/English desktop plans, English overwrite review, all three Japanese mobile tabs, and the downloaded HTML report. The two-page UI PDF and seven-page exported-report PDF were rendered to page images and every page inspected. Print margins and heading/content flow were checked. [Visual review](VISUAL_REVIEW.md) links the retained files.
 
-A passing fixture means the independent expected result and applicable preservation declarations agree with that synthetic fixture. An expected-error fixture can pass with post-migration preservation not-run. Overwrite warnings can remain on intentionally allowed replacements. Equal values at the same path do not establish identity or provenance. No customer validation, demand, novelty, time savings or universal no-loss guarantee has been established.
+The downloaded migration module, runner and original passing fixture were retained together. An intentional mismatch is stored separately. The exact downloaded files were executed again outside the browser: exit 0 for the passing fixture and exit 1 for the mismatch; both parsed JSON reports equal the reports retained by CI.
 
-## Independent review repairs
+The machine-readable [hosted evidence record](evidence/hosted-ci.json) identifies the commit, jobs and downloaded artifact digest. [Browser results](evidence/browser/results.json) record every scenario. Evidence files retain the bytes produced by CI.
 
-Nineteen independent regression tests exercise additional API, resource, runner and actual-handler boundaries with a DOM double. Received findings were repaired: valid long generated paths, descriptor-first envelopes and operation arrays, standard array prototypes, bounded regular-file runner reads, atomic UI selection at caps, terminal worker generations, stale metric clearing, and aggregate report/accounting limits. DOM-double checks do not claim actual browser queues, layout or accessibility behavior. See INDEPENDENT_REVIEW.md for the review's own scope and findings when included.
+## Release repairs
 
-Release-evidence refinements retain the original runnable passing browser-download bundle, a separately named intentional-failure fixture, both runner reports, and the exact downloaded HTML report. The browser suite captures that exported report itself as a screen image and print PDF. These capture steps remain authored and unrun at this freeze.
+The initial dependency lock contained an incomplete optional fsevents entry. Regenerating it from the official npm registry retained Playwright 1.56.0 and complete fsevents 2.3.2 metadata. Clean installation and aggregate verification passed from an extracted source ZIP.
 
-The final package lock was regenerated in a clean directory from the official npm registry while retaining @playwright/test 1.56.0. Clean `npm ci --ignore-scripts` passed, including complete optional fsevents 2.3.2 metadata. This verifies dependency installation, not browser installation or execution.
+Actual release screenshots showed a status banner retaining its prior language. Locale changes now derive a localized summary from the current verification state, including in-progress and stale states. Printed reviews now use A4 margins, keep headings with following content, and keep conservatively short JSON blocks together while longer blocks may paginate. Three release regressions cover these changes; the hosted browser run and fresh visual inspection passed afterward.
+
+## Independent review and limits
+
+The unchanged [independent review](INDEPENDENT_REVIEW.md) found no remaining blocker in its tested scope after the documented repairs. Its 158-test count describes that earlier review freeze; three release regressions bring the current total to 161. DOM-double tests and a Node worker check in that review are distinct from the subsequently executed hosted Chromium tests.
+
+Passing a fixture means its independently supplied expectation and applicable preservation declarations agree with that synthetic case. Expected-error fixtures may pass while post-migration preservation remains not-run. Same-path equality does not prove identity, provenance or a causal move. Overwrite warnings can remain on intentionally allowed replacements.
+
+No Firefox/Safari, assistive-technology, physical-printer, live production storage, real historical-customer fixture, public website availability, demand, novelty, adoption, time-saving or universal no-loss validation is claimed. Test copies and application-specific expectations are still required before integrating the exported module with real data.

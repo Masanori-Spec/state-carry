@@ -1,0 +1,193 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"><title>StateCarry · Harbor editor · guarded upgrade</title><style>body{font:14px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;color:#283a35;line-height:1.6}table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}td,th{padding:8px;border:1px solid #c7d3c5;text-align:left;overflow-wrap:anywhere}th{background:#e9eee4}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f3ea;padding:15px;font-size:11px}.note{padding:15px;background:#fff2d4}h2{margin-top:35px}@page{size:A4;margin:16mm 14mm}@media print{body{margin:0;padding:0;font-size:11px}h1,h2,h3,h4{break-inside:avoid;break-after:avoid}p{orphans:3;widows:3}tr{break-inside:avoid}pre{font:10px/1.45 ui-monospace,monospace;break-inside:auto;orphans:3;widows:3}pre.print-keep{break-inside:avoid}}</style><body><small>STATECARRY / PRESERVATION REVIEW · statecarry/v1</small><h1>Harbor editor · guarded upgrade</h1><p>Contract and expected results passed for these fixtures · 3/3 fixtures passed · 1 overwrite warnings</p><p class="note">A passed fixture does not prove that all saved user data can survive. Expected values and intent declarations are independently authored. Equal values at the same path are observations, not identity or move inference. Empty containers count as original leaves. No storage, network or automatic user-file migration occurs.</p><h2>Version chain</h2><p>1 → 2 → 3</p><h3>1 → 2</h3><pre class="print-keep">[
+  {
+    &quot;op&quot;: &quot;test&quot;,
+    &quot;path&quot;: &quot;/metadata/title&quot;,
+    &quot;value&quot;: null
+  },
+  {
+    &quot;op&quot;: &quot;move&quot;,
+    &quot;from&quot;: &quot;/title&quot;,
+    &quot;path&quot;: &quot;/metadata/title&quot;
+  }
+]</pre><h3>2 → 3</h3><pre class="print-keep">[
+  {
+    &quot;op&quot;: &quot;add&quot;,
+    &quot;path&quot;: &quot;/presentation&quot;,
+    &quot;value&quot;: {
+      &quot;theme&quot;: &quot;paper&quot;,
+      &quot;zoom&quot;: 1
+    }
+  }
+]</pre><h2>V1 · custom data and empty containers</h2><p>Execution: applied / Expected: pass / Preservation: pass</p><h3>Overwrite warnings</h3><pre class="print-keep">[
+  {
+    &quot;kind&quot;: &quot;overwrite&quot;,
+    &quot;operation&quot;: 1,
+    &quot;path&quot;: &quot;/metadata/title&quot;,
+    &quot;beforePreview&quot;: &quot;null&quot;,
+    &quot;beforeTruncated&quot;: false,
+    &quot;from&quot;: 1,
+    &quot;to&quot;: 2
+  }
+]</pre><h3>Original envelope</h3><pre class="print-keep">{
+  &quot;version&quot;: 1,
+  &quot;payload&quot;: {
+    &quot;title&quot;: &quot;Harbor map&quot;,
+    &quot;metadata&quot;: {
+      &quot;title&quot;: null
+    },
+    &quot;customFields&quot;: {
+      &quot;owner&quot;: &quot;Aya&quot;,
+      &quot;workshop&quot;: &quot;north&quot;
+    },
+    &quot;items&quot;: [
+      {
+        &quot;id&quot;: &quot;dock&quot;,
+        &quot;label&quot;: &quot;Dock&quot;,
+        &quot;tags&quot;: []
+      }
+    ],
+    &quot;empty&quot;: {}
+  }
+}</pre><h3>Actual result</h3><pre class="print-keep">{
+  &quot;version&quot;: 3,
+  &quot;payload&quot;: {
+    &quot;metadata&quot;: {
+      &quot;title&quot;: &quot;Harbor map&quot;
+    },
+    &quot;customFields&quot;: {
+      &quot;owner&quot;: &quot;Aya&quot;,
+      &quot;workshop&quot;: &quot;north&quot;
+    },
+    &quot;items&quot;: [
+      {
+        &quot;id&quot;: &quot;dock&quot;,
+        &quot;label&quot;: &quot;Dock&quot;,
+        &quot;tags&quot;: []
+      }
+    ],
+    &quot;empty&quot;: {},
+    &quot;presentation&quot;: {
+      &quot;theme&quot;: &quot;paper&quot;,
+      &quot;zoom&quot;: 1
+    }
+  }
+}</pre><h3>Independent expectation</h3><pre class="print-keep">{
+  &quot;kind&quot;: &quot;value&quot;,
+  &quot;value&quot;: {
+    &quot;version&quot;: 3,
+    &quot;payload&quot;: {
+      &quot;metadata&quot;: {
+        &quot;title&quot;: &quot;Harbor map&quot;
+      },
+      &quot;customFields&quot;: {
+        &quot;owner&quot;: &quot;Aya&quot;,
+        &quot;workshop&quot;: &quot;north&quot;
+      },
+      &quot;items&quot;: [
+        {
+          &quot;id&quot;: &quot;dock&quot;,
+          &quot;label&quot;: &quot;Dock&quot;,
+          &quot;tags&quot;: []
+        }
+      ],
+      &quot;empty&quot;: {},
+      &quot;presentation&quot;: {
+        &quot;theme&quot;: &quot;paper&quot;,
+        &quot;zoom&quot;: 1
+      }
+    }
+  }
+}</pre><h3>Preservation / intent declarations</h3><pre class="print-keep">[
+  {
+    &quot;kind&quot;: &quot;preserve&quot;,
+    &quot;source&quot;: &quot;/title&quot;,
+    &quot;target&quot;: &quot;/metadata/title&quot;,
+    &quot;reason&quot;: &quot;Move the project title without changing its value&quot;,
+    &quot;ok&quot;: true,
+    &quot;detail&quot;: &quot;Explicit old/new equality&quot;
+  },
+  {
+    &quot;kind&quot;: &quot;change&quot;,
+    &quot;source&quot;: &quot;/metadata/title&quot;,
+    &quot;target&quot;: &quot;/metadata/title&quot;,
+    &quot;reason&quot;: &quot;Replace the explicit null placeholder with the old title&quot;,
+    &quot;ok&quot;: true,
+    &quot;detail&quot;: &quot;Target must match independent expected output&quot;
+  }
+]</pre><h3>Original-leaf accounting</h3><table><tr><th>Original path</th><th>Original value</th><th>Observed / declared status</th></tr><tr><td>/title</td><td>&quot;Harbor map&quot;</td><td>preserved · /title</td></tr><tr><td>/metadata/title</td><td>null</td><td>intentional-change · /metadata/title</td></tr><tr><td>/customFields/owner</td><td>&quot;Aya&quot;</td><td>same-path-equal</td></tr><tr><td>/customFields/workshop</td><td>&quot;north&quot;</td><td>same-path-equal</td></tr><tr><td>/items/0/id</td><td>&quot;dock&quot;</td><td>same-path-equal</td></tr><tr><td>/items/0/label</td><td>&quot;Dock&quot;</td><td>same-path-equal</td></tr><tr><td>/items/0/tags</td><td>[]</td><td>same-path-equal</td></tr><tr><td>/empty</td><td>{}</td><td>same-path-equal</td></tr></table><h2>V1 · existing title must reject</h2><p>Execution: error / Expected: pass / Preservation: not-run</p><p>PATCH_FAILED: Test operation did not match</p><h3>Overwrite warnings</h3><pre class="print-keep">[]</pre><h3>Original envelope</h3><pre class="print-keep">{
+  &quot;version&quot;: 1,
+  &quot;payload&quot;: {
+    &quot;title&quot;: &quot;Harbor map&quot;,
+    &quot;metadata&quot;: {
+      &quot;title&quot;: &quot;Owner-authored title&quot;
+    },
+    &quot;customFields&quot;: {
+      &quot;owner&quot;: &quot;Aya&quot;,
+      &quot;workshop&quot;: &quot;north&quot;
+    },
+    &quot;items&quot;: [
+      {
+        &quot;id&quot;: &quot;dock&quot;,
+        &quot;label&quot;: &quot;Dock&quot;,
+        &quot;tags&quot;: []
+      }
+    ],
+    &quot;empty&quot;: {}
+  }
+}</pre><h3>Actual result</h3><pre class="print-keep">{
+  &quot;code&quot;: &quot;PATCH_FAILED&quot;,
+  &quot;message&quot;: &quot;Test operation did not match&quot;,
+  &quot;operation&quot;: 0,
+  &quot;from&quot;: 1,
+  &quot;to&quot;: 2
+}</pre><h3>Independent expectation</h3><pre class="print-keep">{
+  &quot;kind&quot;: &quot;error&quot;,
+  &quot;code&quot;: &quot;PATCH_FAILED&quot;
+}</pre><h3>Preservation / intent declarations</h3><pre class="print-keep">[]</pre><h3>Original-leaf accounting</h3><table><tr><th>Original path</th><th>Original value</th><th>Observed / declared status</th></tr></table><h2>V2 · skip no version</h2><p>Execution: applied / Expected: pass / Preservation: pass</p><h3>Overwrite warnings</h3><pre class="print-keep">[]</pre><h3>Original envelope</h3><pre class="print-keep">{
+  &quot;version&quot;: 2,
+  &quot;payload&quot;: {
+    &quot;metadata&quot;: {
+      &quot;title&quot;: &quot;Version two project&quot;
+    },
+    &quot;customFields&quot;: {
+      &quot;futureField&quot;: &quot;keep me&quot;
+    },
+    &quot;items&quot;: [],
+    &quot;empty&quot;: {}
+  }
+}</pre><h3>Actual result</h3><pre class="print-keep">{
+  &quot;version&quot;: 3,
+  &quot;payload&quot;: {
+    &quot;metadata&quot;: {
+      &quot;title&quot;: &quot;Version two project&quot;
+    },
+    &quot;customFields&quot;: {
+      &quot;futureField&quot;: &quot;keep me&quot;
+    },
+    &quot;items&quot;: [],
+    &quot;empty&quot;: {},
+    &quot;presentation&quot;: {
+      &quot;theme&quot;: &quot;paper&quot;,
+      &quot;zoom&quot;: 1
+    }
+  }
+}</pre><h3>Independent expectation</h3><pre class="print-keep">{
+  &quot;kind&quot;: &quot;value&quot;,
+  &quot;value&quot;: {
+    &quot;version&quot;: 3,
+    &quot;payload&quot;: {
+      &quot;metadata&quot;: {
+        &quot;title&quot;: &quot;Version two project&quot;
+      },
+      &quot;customFields&quot;: {
+        &quot;futureField&quot;: &quot;keep me&quot;
+      },
+      &quot;items&quot;: [],
+      &quot;empty&quot;: {},
+      &quot;presentation&quot;: {
+        &quot;theme&quot;: &quot;paper&quot;,
+        &quot;zoom&quot;: 1
+      }
+    }
+  }
+}</pre><h3>Preservation / intent declarations</h3><pre class="print-keep">[]</pre><h3>Original-leaf accounting</h3><table><tr><th>Original path</th><th>Original value</th><th>Observed / declared status</th></tr><tr><td>/metadata/title</td><td>&quot;Version two project&quot;</td><td>same-path-equal</td></tr><tr><td>/customFields/futureField</td><td>&quot;keep me&quot;</td><td>same-path-equal</td></tr><tr><td>/items</td><td>[]</td><td>same-path-equal</td></tr><tr><td>/empty</td><td>{}</td><td>same-path-equal</td></tr></table><h2>Interpretation limits</h2><p>Preserve compares an explicitly named old subtree to a new subtree. Change requires a reason and a target matching the independently expected output. Drop requires a reason and absence of the original path after migration. Array paths describe positions, not entity identities. Unreviewed original leaves block contract success. Extra output fields and nonempty container shape are checked through the whole expected output.</p></body></html>

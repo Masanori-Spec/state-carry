@@ -1,0 +1,103 @@
+{
+  "status": "passed",
+  "sandbox": true,
+  "results": [
+    {
+      "name": "Both locales, keyboard skip link and roving tabs at deployed subpath",
+      "status": "passed"
+    },
+    {
+      "name": "Overwrite fixture opens with separate execution, expectation and contract results",
+      "status": "passed"
+    },
+    {
+      "name": "Plan edits keep independent expectations fixed and invalidate prior exports",
+      "status": "passed"
+    },
+    {
+      "name": "Unapplied edits block navigation and export; cancellation is recoverable",
+      "status": "passed"
+    },
+    {
+      "name": "Guided operation append and undo preserve expectations",
+      "status": "passed"
+    },
+    {
+      "name": "Independent fixture value edits and preservation contract failures are distinct",
+      "status": "passed"
+    },
+    {
+      "name": "Malformed project import is atomic and hostile strings stay data",
+      "status": "passed"
+    },
+    {
+      "name": "Oversized and malformed UTF8 files reject, cancelled reads stay cancelled",
+      "status": "passed"
+    },
+    {
+      "name": "Newer import text supersedes delayed file reads",
+      "status": "passed"
+    },
+    {
+      "name": "Interrupted workers never publish a stale result",
+      "status": "passed"
+    },
+    {
+      "name": "Worker-start and download failures recover visibly",
+      "status": "passed"
+    },
+    {
+      "name": "Downloaded same-engine artifact executes passing and deliberate failing fixture",
+      "status": "passed"
+    },
+    {
+      "name": "Loaded-app offline re-verification, both locales and390px layout",
+      "status": "passed"
+    },
+    {
+      "name": "Print, cancellation/history and reload are explicit",
+      "status": "passed"
+    },
+    {
+      "name": "No external runtime requests or browser errors",
+      "status": "passed"
+    }
+  ],
+  "errors": [],
+  "requests": [
+    "http://127.0.0.1:4173/state-carry/",
+    "http://127.0.0.1:4173/state-carry/styles.css",
+    "http://127.0.0.1:4173/state-carry/app.mjs",
+    "http://127.0.0.1:4173/state-carry/src/core.mjs",
+    "http://127.0.0.1:4173/state-carry/src/example.mjs",
+    "http://127.0.0.1:4173/state-carry/src/export.mjs",
+    "http://127.0.0.1:4173/state-carry/src/runtime-source.mjs",
+    "blob:http://127.0.0.1:4173/64812f8d-bba0-4239-b925-ec971e16463e",
+    "blob:http://127.0.0.1:4173/57ffa75b-2642-4c69-bbf8-d4c49aa4c220",
+    "blob:http://127.0.0.1:4173/7928931f-762d-4adf-89c9-22e153a8b6d3",
+    "blob:http://127.0.0.1:4173/ef9e82a9-66e9-4fa0-b88a-a6a028e9745a",
+    "blob:http://127.0.0.1:4173/dcb7c4a7-ca65-4fab-87d2-b47ac4d128b6",
+    "blob:http://127.0.0.1:4173/9ebb7fda-ff73-4006-9f94-592d908767f0",
+    "blob:http://127.0.0.1:4173/6ad7e0e3-dd2c-477f-acd0-7ade8678482a",
+    "blob:http://127.0.0.1:4173/3bd15d19-bfda-4e4a-b726-7d7ac18b2181",
+    "blob:http://127.0.0.1:4173/78f20a2d-3e29-4c45-9eb4-139405d90604",
+    "blob:http://127.0.0.1:4173/78d594d7-5611-4a6b-a123-db827ca1db10",
+    "blob:http://127.0.0.1:4173/a9a30226-c306-487d-8c01-93f3b7cd7b26",
+    "blob:http://127.0.0.1:4173/1ca2e2f3-6fa2-463b-bbfb-6c2725946f46",
+    "blob:http://127.0.0.1:4173/9330e9a3-11e7-4732-8a13-49edc83ccb70",
+    "blob:http://127.0.0.1:4173/54d6d822-ddcb-4426-b99c-eb4c407b4883",
+    "blob:http://127.0.0.1:4173/793b55ed-f3dd-42e7-951a-57742fdd4f80",
+    "blob:http://127.0.0.1:4173/ce698be9-18b5-432a-ab03-cbc9fc49e88b",
+    "blob:http://127.0.0.1:4173/36cb6558-b6be-44cb-b633-08f63eb579a5",
+    "blob:http://127.0.0.1:4173/86d26f05-706d-47e5-9d9d-7d771beece56",
+    "blob:http://127.0.0.1:4173/3964fbb2-f98d-4d0b-a4e3-985a7315eb08",
+    "http://127.0.0.1:4173/state-carry/",
+    "http://127.0.0.1:4173/state-carry/styles.css",
+    "http://127.0.0.1:4173/state-carry/app.mjs",
+    "http://127.0.0.1:4173/state-carry/src/core.mjs",
+    "http://127.0.0.1:4173/state-carry/src/example.mjs",
+    "http://127.0.0.1:4173/state-carry/src/export.mjs",
+    "http://127.0.0.1:4173/state-carry/src/runtime-source.mjs",
+    "blob:http://127.0.0.1:4173/f1dbdd1c-5768-4c36-89da-c32e7672989a"
+  ]
+}

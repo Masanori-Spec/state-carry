@@ -1,0 +1,67 @@
+{
+  "project": "StateCarry",
+  "date": "2026-10-04",
+  "functionalCommit": "e064c17219cdc2784f2a11dfda2a9ca76735ba3c",
+  "run": {
+    "id": 37178149714,
+    "url": "https://github.com/Masanori-Spec/state-carry/actions/runs/37178149714",
+    "conclusion": "success"
+  },
+  "environment": {
+    "runner": "ubuntu-22.04",
+    "node": [
+      22,
+      24
+    ],
+    "python": "3.12",
+    "browser": "Playwright 1.56.0 Chromium",
+    "chromiumSandbox": true,
+    "basePath": "/state-carry/"
+  },
+  "jobs": [
+    {
+      "id": 111365007175,
+      "name": "engine (24)",
+      "conclusion": "success"
+    },
+    {
+      "id": 111365007199,
+      "name": "engine (22)",
+      "conclusion": "success"
+    },
+    {
+      "id": 111365007245,
+      "name": "browser",
+      "conclusion": "success"
+    }
+  ],
+  "checks": {
+    "testsPassedPerEngine": 161,
+    "testsFailed": 0,
+    "upstreamDisabledSkips": 4,
+    "enabledUpstreamCorpusCases": 108,
+    "patchDifferentialCases": 1200,
+    "independentContractCases": 1000,
+    "browserScenariosPassed": 15
+  },
+  "browserArtifact": {
+    "id": 11292924838,
+    "name": "statecarry-browser-evidence",
+    "bytes": 1848297,
+    "sha256": "2eb2d9f9e2c11cb86520847b92d9f2aaa3b2199b494cecf7874d80f90b56c600"
+  },
+  "inspection": {
+    "screenshotsInspected": 7,
+    "uiPrintPages": 2,
+    "exportedReportPages": 7,
+    "downloadedRunnerPassingExit": 0,
+    "downloadedRunnerIntentionalMismatchExit": 1,
+    "downloadedRunnerReportsMatchCI": true
+  },
+  "limits": [
+    "Synthetic fixtures only; no real application storage integration or historical-customer fixture validation",
+    "No universal preservation, novelty, demand, adoption or losslessness guarantee",
+    "Chromium coverage only; no Firefox, Safari, assistive-technology or physical-printer claim",
+    "No public website deployment"
+  ]
+}

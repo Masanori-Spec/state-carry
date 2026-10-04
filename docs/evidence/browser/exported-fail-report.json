@@ -1,0 +1,244 @@
+{
+  "schema": "statecarry-report/v1",
+  "name": "Harbor editor · guarded upgrade",
+  "ok": false,
+  "results": [
+    {
+      "id": "ordinary",
+      "name": "V1 · custom data and empty containers",
+      "ok": false,
+      "expectation": "mismatch",
+      "execution": "applied",
+      "contractStatus": "failed",
+      "migration": {
+        "ok": true,
+        "value": {
+          "version": 3,
+          "payload": {
+            "metadata": {
+              "title": "Harbor map"
+            },
+            "customFields": {
+              "owner": "Aya",
+              "workshop": "north"
+            },
+            "items": [
+              {
+                "id": "dock",
+                "label": "Dock",
+                "tags": []
+              }
+            ],
+            "empty": {},
+            "presentation": {
+              "theme": "paper",
+              "zoom": 1
+            }
+          }
+        },
+        "steps": [
+          {
+            "from": 1,
+            "to": 2,
+            "ok": true,
+            "operations": 2,
+            "beforePreview": "{\"title\":\"Harbor map\",\"metadata\":{\"title\":null},\"customFields\":{\"owner\":\"Aya\",\"workshop\":\"north\"},\"items\":[{\"id\":\"dock\",\"label\":\"Dock\",\"tags\":[]}],\"empty\":{}}",
+            "afterPreview": "{\"metadata\":{\"title\":\"Harbor map\"},\"customFields\":{\"owner\":\"Aya\",\"workshop\":\"north\"},\"items\":[{\"id\":\"dock\",\"label\":\"Dock\",\"tags\":[]}],\"empty\":{}}",
+            "previewLimit": 2000
+          },
+          {
+            "from": 2,
+            "to": 3,
+            "ok": true,
+            "operations": 1,
+            "beforePreview": "{\"metadata\":{\"title\":\"Harbor map\"},\"customFields\":{\"owner\":\"Aya\",\"workshop\":\"north\"},\"items\":[{\"id\":\"dock\",\"label\":\"Dock\",\"tags\":[]}],\"empty\":{}}",
+            "afterPreview": "{\"metadata\":{\"title\":\"Harbor map\"},\"customFields\":{\"owner\":\"Aya\",\"workshop\":\"north\"},\"items\":[{\"id\":\"dock\",\"label\":\"Dock\",\"tags\":[]}],\"empty\":{},\"presentation\":{\"theme\":\"paper\",\"zoom\":1}}",
+            "previewLimit": 2000
+          }
+        ],
+        "warnings": [
+          {
+            "kind": "overwrite",
+            "operation": 1,
+            "path": "/metadata/title",
+            "beforePreview": "null",
+            "beforeTruncated": false,
+            "from": 1,
+            "to": 2
+          }
+        ]
+      },
+      "contract": {
+        "ok": false,
+        "checks": [
+          {
+            "kind": "preserve",
+            "source": "/title",
+            "target": "/metadata/title",
+            "reason": "Move the project title without changing its value",
+            "ok": true,
+            "detail": "Explicit old/new equality"
+          },
+          {
+            "kind": "change",
+            "source": "/metadata/title",
+            "target": "/metadata/title",
+            "reason": "Replace the explicit null placeholder with the old title",
+            "ok": false,
+            "detail": "Target must match independent expected output"
+          }
+        ],
+        "accounting": [
+          {
+            "path": "/title",
+            "value": "Harbor map",
+            "status": "preserved",
+            "contractSource": "/title"
+          },
+          {
+            "path": "/metadata/title",
+            "value": null,
+            "status": "contract-failed",
+            "contractSource": "/metadata/title"
+          },
+          {
+            "path": "/customFields/owner",
+            "value": "Aya",
+            "status": "same-path-equal"
+          },
+          {
+            "path": "/customFields/workshop",
+            "value": "north",
+            "status": "same-path-equal"
+          },
+          {
+            "path": "/items/0/id",
+            "value": "dock",
+            "status": "same-path-equal"
+          },
+          {
+            "path": "/items/0/label",
+            "value": "Dock",
+            "status": "same-path-equal"
+          },
+          {
+            "path": "/items/0/tags",
+            "value": [],
+            "status": "same-path-equal"
+          },
+          {
+            "path": "/empty",
+            "value": {},
+            "status": "same-path-equal"
+          }
+        ],
+        "unreviewed": 1
+      }
+    },
+    {
+      "id": "collision",
+      "name": "V1 · existing title must reject",
+      "ok": true,
+      "expectation": "pass",
+      "execution": "error",
+      "contractStatus": "not-run",
+      "migration": {
+        "ok": false,
+        "error": {
+          "code": "PATCH_FAILED",
+          "message": "Test operation did not match",
+          "operation": 0,
+          "from": 1,
+          "to": 2
+        },
+        "steps": [
+          {
+            "from": 1,
+            "to": 2,
+            "ok": false,
+            "operations": 0,
+            "beforePreview": "{\"title\":\"Harbor map\",\"metadata\":{\"title\":\"Owner-authored title\"},\"customFields\":{\"owner\":\"Aya\",\"workshop\":\"north\"},\"items\":[{\"id\":\"dock\",\"label\":\"Dock\",\"tags\":[]}],\"empty\":{}}",
+            "afterPreview": null,
+            "previewLimit": 2000
+          }
+        ],
+        "warnings": []
+      },
+      "contract": null
+    },
+    {
+      "id": "intermediate",
+      "name": "V2 · skip no version",
+      "ok": true,
+      "expectation": "pass",
+      "execution": "applied",
+      "contractStatus": "pass",
+      "migration": {
+        "ok": true,
+        "value": {
+          "version": 3,
+          "payload": {
+            "metadata": {
+              "title": "Version two project"
+            },
+            "customFields": {
+              "futureField": "keep me"
+            },
+            "items": [],
+            "empty": {},
+            "presentation": {
+              "theme": "paper",
+              "zoom": 1
+            }
+          }
+        },
+        "steps": [
+          {
+            "from": 2,
+            "to": 3,
+            "ok": true,
+            "operations": 1,
+            "beforePreview": "{\"metadata\":{\"title\":\"Version two project\"},\"customFields\":{\"futureField\":\"keep me\"},\"items\":[],\"empty\":{}}",
+            "afterPreview": "{\"metadata\":{\"title\":\"Version two project\"},\"customFields\":{\"futureField\":\"keep me\"},\"items\":[],\"empty\":{},\"presentation\":{\"theme\":\"paper\",\"zoom\":1}}",
+            "previewLimit": 2000
+          }
+        ],
+        "warnings": []
+      },
+      "contract": {
+        "ok": true,
+        "checks": [],
+        "accounting": [
+          {
+            "path": "/metadata/title",
+            "value": "Version two project",
+            "status": "same-path-equal"
+          },
+          {
+            "path": "/customFields/futureField",
+            "value": "keep me",
+            "status": "same-path-equal"
+          },
+          {
+            "path": "/items",
+            "value": [],
+            "status": "same-path-equal"
+          },
+          {
+            "path": "/empty",
+            "value": {},
+            "status": "same-path-equal"
+          }
+        ],
+        "unreviewed": 0
+      }
+    }
+  ],
+  "summary": {
+    "fixtures": 3,
+    "passed": 2,
+    "expectedMatched": 2,
+    "contractsPassed": 1,
+    "overwrites": 1
+  }
+}
